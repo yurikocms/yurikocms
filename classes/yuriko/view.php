@@ -13,7 +13,7 @@
 
  class Yuriko_View extends Kohana_View {
 
-	 protected static $loaded = array();
+	 public static $loaded = array();
 
 	 /**
 	 * Sets the initial view filename and local data.

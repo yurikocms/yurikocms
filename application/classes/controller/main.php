@@ -4,6 +4,8 @@ class Controller_Main extends Controller {
 
 	public function action_index()
 	{
+		$config = Kohana::config('database');
+		echo Kohana::debug($config);
 		$this->request->response = 'hello, world!';
 	}
 

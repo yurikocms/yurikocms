@@ -49,10 +49,12 @@ Kohana::$config->attach(new Kohana_Config_File);
  * Enable modules. Modules are referenced by a relative or absolute path.
  */
 Kohana::modules(array(
+	 'core'       => MODPATH.'yuriko_core',
 	 'database'   => MODPATH.'database',   // Database access
+	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping (not complete)
 	// 'image'      => MODPATH.'image',      // Image manipulation
 	// 'kodoc'      => MODPATH.'kodoc',      // Kohana documentation
-	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping (not complete)
+	 
 	// 'pagination' => MODPATH.'pagination', // Paging of results
 	// 'paypal'     => MODPATH.'paypal',     // PayPal integration (not complete)
 	// 'todoist'    => MODPATH.'todoist',    // Todoist integration
@@ -64,12 +66,6 @@ Kohana::modules(array(
  * Set the routes. Each route must have a minimum of a name, a URI and a set of
  * defaults for the URI.
  */
-Route::set('admin', 'admin(/<controller>(/<action>(/<id>)))')
-	->defaults(array(
-		'controller' => 'main',
-		'action'     => 'index',
-		'directory'  => 'admin',
-	));
 Route::set('default', '(<controller>(/<action>(/<id>)))')
 	->defaults(array(
 		'controller' => 'main',

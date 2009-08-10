@@ -8,14 +8,6 @@
  */
 
 /**
- * Setup notices
- */
-Event::add('yuriko.post_routes', array('notice', 'load'));
-//save the unused notices right before headers are sent or user is redirected
-Event::add('yuriko.send_headers', array('notice', 'save'));
-Event::add('yuriko.redirect', array('notice', 'save'));
-
-/**
  * Setup Routes
  */
 Route::set('admin', 'admin(/<controller>(/<action>(/<id>)))')

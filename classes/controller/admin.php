@@ -8,5 +8,9 @@
  */
 
  abstract class Controller_Admin extends Controller_Template {
+
+	 public $template = 'templates/admin/default';
+
+	 public $title = 'YurikoCMS - Admin Panel';
 	 
  }

@@ -10,9 +10,10 @@
 /**
  * Setup Routes
  */
-Route::set('admin', 'admin(/<controller>(/<action>(/<id>)))')
+Route::set('admin', 'admin(/<permalink>(/<id>))')
 	->defaults(array(
-		'controller' => 'main',
-		'action'     => 'index',
+		'controller' => 'page',
+		'action'     => 'load',
+		'permalink'  => 'main',
 		'directory'  => 'admin',
 	));

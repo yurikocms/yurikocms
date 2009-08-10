@@ -7,12 +7,11 @@
  * @license    http://yurikocms.com/license
  */
  
-class Controller_Admin_Main extends Controller_Admin {
+class Controller_Admin_Page extends Controller_Admin {
 
-	public function action_index()
+	public function action_load($permalink)
 	{
-
-		$this->request->response = 'hello, admin world!';
+		
 	}
 
 } // End Admin Main Controller

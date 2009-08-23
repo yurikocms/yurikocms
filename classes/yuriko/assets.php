@@ -11,175 +11,196 @@
  
 class Yuriko_Assets {
 	
+	// asset 'groups' defined in the assets config files
+	static protected $assets = array();
+
 	static protected $scripts = array();
 	static protected $stylesheets = array();
 	static protected $loaded_dependencies = FALSE;
 
 	/**
-	 * Defines a group of css files so views can depend on it.
+	 * Adds an asset group to the list of files to include
 	 *
-	 * @param string $name - the name of the group
-	 * @param array $files - the files in this group
-	 * @param mixed $options - nothing yet
+	 * @param String $key - config key of the asset group
 	 */
-	public static function define_css_group($name, array $files, $options = NULL)
+	public static function add_asset($key)
 	{
-		$current = (array)Kohana::config('assets.groups.css.'.$name);
-		Kohana::config_set('assets.groups.css.'.$name,
-			array_merge($current, $files));
+		self::$assets[$key] = Kohana::config('assets.'.$key);
 	}
+
 	/**
-	 * Defines a group of js files so views can depend on it.
-	 *
-	 * @param string $name - the name of the group
-	 * @param array $files - the files in this group
-	 * @param mixed $options - nothing yet
+	 * Custom sorting method for assets based on 'weight' key
 	 */
-	public static function define_js_group($name, array $files, $options = NULL)
+	public static function sort_assets($a, $b)
 	{
-		$current = (array)Kohana::config('assets.groups.js'.$name);
-		Kohana::config_set('assets.groups.js.'.$name,
-			array_merge($current, $files));
+        if ($a['weight'] == $b['weight']) {
+            return 0;
+        }
+        return ($a['weight'] > $b['weight']) ? +1 : -1;
 	}
+
 	/**
-	 * Defines a dependency for a set of views so that any time the
-	 * particular view is used, the assets helper knows that it requires
-	 * certain css files to be loaded as well.
-	 *
-	 * @param array $views - the views to define dependencies for
-	 * @param array $groups - the css groups that these views depend on
+	 * Renders all the proper assets depending on the views currently used
 	 */
-	public static function define_css_dependency(array $views, array $groups)
+	public static function render()
 	{
-		foreach ($views as $view)
+		// load dependencies
+		if ( ! self::$loaded_dependencies)
 		{
-			$current = (array)Kohana::config('assets.dependencies.css.'.$view);
-			Kohana::config_set('assets.dependencies.css.'.$view,
-				array_merge($current, $groups));
+			self::load_dependencies();
 		}
-	}
-	/**
-	 * Same as define_css_dependency but for js files
-	 *
-	 * @param array $views - the views to define dependencies for
-	 * @param array $groups - the js groups that these views depend on
-	 */
-	public static function define_js_dependency(array $views, array $groups)
-	{
-		foreach ($views as $view)
+		// sort the assets
+		usort(self::$assets, array('assets', 'sort_assets'));
+		foreach (self::$assets as $asset)
 		{
-			$current = (array)Kohana::config('assets.dependencies.js.'.$view);
-			Kohana::config_set('assets.dependencies.js.'.$view,
-				array_merge($current, $groups));
+			// get array of files
+			$files = array();
+			if (isset($asset['file']))
+			{
+				$files[] = $asset['file'];
+			}
+			if (isset($asset['files']))
+			{
+				$files = array_merge($files, $asset['files']);
+			}
+			// output files
+			
+			foreach ($files as $file)
+			{
+				if (isset($asset['wrapper']))
+				{
+					echo $asset['wrapper'][0]."\n";
+				}
+				if ($file[1] === 'css')
+				{
+					echo html::style($file[0])."\n";
+				}
+				elseif ($file[1] === 'js')
+				{
+					echo html::script($file[0])."\n";
+				}
+				if (isset($asset['wrapper']))
+				{
+					echo $asset['wrapper'][1]."\n";
+				}
+			}
 		}
+		
 	}
-	/**
-	 * Adds a css file to the array of files to include for this request.
-	 *
-	 * @param string $file - the css file
-	 */
-	public static function add_stylesheet($file)
-	{
-		if (!in_array($file, self::$stylesheets))
-			self::$stylesheets[] = $file;
-	}
-	/**
-	 * Adds a js file to the array of files to include for this request.
-	 *
-	 * @param string $file - the js file
-	 */
-	public static function add_script($file)
-	{
-		if (!in_array($file, self::$scripts))
-			self::$scripts[] = $file;
-	}
-	/**
-	 * Generated the html for the page header to include all the css files.
-	 *
-	 * @return string - the html to include in the page haeder
-	 */
-	static public function stylesheets()
-	{
-		$output = '';
-		foreach (self::$stylesheets as $stylesheet)
-		{
-			$output .= '	'.html::stylesheet($stylesheet);
-		}
-		return $output;
-	}
-	/**
-	 * Generated the html for the page header to include all the js files.
-	 *
-	 * @return string - the html to include in the page haeder
-	 */
-	static public function scripts()
-	{
-		$output = '';
-		foreach (self::$scripts as $script)
-		{
-			$output .= '	'.html::script($script);
-		}
-		return $output;
-	}
-	/**
-	 * Calculates all the dependencies and returns the html for both css and js.
-	 *
-	 * @return string - the html to include in the page header
-	 */
-	public static function all()
-	{
-		self::load_dependencies();
-		return self::stylesheets().self::scripts();
-	}
-	/**
-	 * Adds a css group to the array of css files to include for this request
-	 *
-	 * @param string $name - name of group
-	 */
-	public static function enable_css_group($name)
-	{
-		$files = (array)Kohana::config('assets.groups.css.'.$name);
-		foreach ($files as $file)
-		{
-			self::add_stylesheet($file);
-		}
-	}
-	/**
-	 * Adds a js group to the array of css files to include for this request
-	 *
-	 * @param string $name - name of group
-	 */
-	public static function enable_js_group($name)
-	{
-		$files = (array)Kohana::config('assets.groups.js.'.$name);
-		foreach ($files as $file)
-		{
-			self::add_script($file);
-		}
-	}
+	
 	/**
 	 * Calculates all the dependencies based on which views were loaded
 	 * for this request. Only runs once per request (should be done at the end)
 	 * Called automatically by assets::all()
+	 *
+	 * @param Bool $force - will reload dependencies if TRUE
 	 */
-	public static function load_dependencies()
+	public static function load_dependencies($force = FALSE)
 	{
-		if (!self::$loaded_dependencies)
+		if (!self::$loaded_dependencies OR $force)
 		{
-			foreach(View::$loaded as $view)
+			// the Views that where used
+			$views = (array)View::$loaded;
+			// the assets that where defined
+			$assets = (array)Kohana::config('assets');
+			foreach ($assets as $key => $asset)
 			{
-				$required_css = (array)Kohana::config('assets.dependencies.css.'.$view);
-				foreach ($required_css as $group)
+				$testing_views = $views;
+				$rules = $asset['rules'];
+				// @TODO: cache stuff
+
+				// check exclude rules first
+				if (isset($rules['exclude_views']))
 				{
-					self::enable_css_group($group);
+					// unset any views that are excluded so we don't them
+					$testing_views = array_diff($testing_views, $rules['exclude_views']);
 				}
-				$required_js = (array)Kohana::config('assets.dependencies.js.'.$view);
-				foreach ($required_js as $group)
+				if (isset($rules['exclude_regex']))
 				{
-					self::enable_js_group($group);
+					// @TODO: implement
 				}
-				self::$loaded_dependencies = TRUE;
+				if (isset($rules['exclude_directories']))
+				{
+					// unset any views that are in these directories
+					$to_unset = array();
+					foreach ($testing_views as $v)
+					{
+						if (self::is_in_directories(
+								$rules['exclude_directories'], (array)$v))
+						{
+							$to_unset[] = $v;
+						}
+					}
+					$testing_views = array_diff($testing_views, $to_unset);
+				}
+
+				// start testing inclusion rules (only need one match)
+				if (isset($rules['views']))
+				{
+					$diff = array_diff($testing_views, $rules['views']);
+					// if $diff is smaller, we had at least one match
+					if (count($diff) < count($testing_views))
+					{
+						self::add_asset($key);
+						// skip to next asset
+						continue;
+					}
+				}
+
+				if (isset($rules['directories']))
+				{
+					if (self::is_in_directories(
+								$rules['directories'], $testing_views))
+					{
+						self::add_asset($key);
+						// skip to next asset
+						continue;
+					}
+				}
+
+				// check regex last for performance reasons
+				if (isset($rules['regex']))
+				{
+					// @TODO: implement
+				}
 			}
+			self::$loaded_dependencies = TRUE;
 		}
 	}
-} // End assets_Core
+
+	/**
+	 *
+	 * @param array $directories
+	 * @param array $views - the array of view paths to test
+	 * @return Bool
+	 */
+	public static function is_in_directories(array $directories, array $views)
+	{
+		$match = FALSE;
+		
+		foreach ($directories as $dir)
+		{
+			foreach ($views as $view)
+			{
+				// check if $dir is in the path of $view
+				if (strpos(dirname($view), $dir) !== FALSE)
+				{
+					$match = TRUE;
+				}
+			}
+		}
+		return $match;
+	}
+
+	/**
+	 *
+	 * @param String $regex - the regex to test all the views against
+	 * @param array $views - the array of view paths to test
+	 * @return Bool
+	 */
+	public static function matches_regex(array $regexes, array $views)
+	{
+		// @TODO: implement
+		return FALSE;
+	}
+} // End Assets

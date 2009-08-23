@@ -8,95 +8,107 @@
 
 class Yuriko_Notice{
 
+	//array of undisplayed noticed
 	static protected $notices = array();
-	static protected $views = array();
+	//array of displayed notices (won't exist on next page load)
+	static protected $history = array();
 
 	/**
+	 * Checks if a notice or group of notices exists
 	 *
-	 * @param <type> $type
-	 * @return <type>
+	 * @param String $group - the group of notices to check for
+	 * @return Bool - if notices where found or not
 	 */
-	public static function exists($type = NULL)
+	public static function exists($group = NULL)
 	{
-		if ($type === NULL)
+		if ($group === NULL)
 		{
-			return (bool)((sizeof(self::$notices) OR (sizeof(self::$views))));
+			return (bool)((sizeof(self::$notices) OR (sizeof(self::$history))));
 		}
 		else
 		{
-			return (isset(self::$notices[$type])) OR (isset(self::$views[$type]));
+			return (isset(self::$notices[$group])) OR (isset(self::$history[$group]));
 		}
 	}
 
 	/**
+	 * Add a notice to display to the user.
 	 *
-	 * @param <type> $message
-	 * @param <type> $type
+	 * @param String $message
+	 * @param String $group
+	 * @param Array $attr - array of attributes for the notice
 	 */
-	public static function add($message, $type = 'success')
+	public static function add($message, $group = 'default', $attr = array())
 	{
-		self::$notices[$type][] = $message;
+		$defaults = array('class' => 'success');
+		$attr = array_merge($defaults, $attr);
+		$notice = array
+		(
+			'message' => $message,
+			'attr' => $attr,
+		);
+		self::$notices[$group][] = $notice;
+		Session::instance()->set('notices', self::$notices);
 	}
 
 	/**
+	 * Renders a group of notices
 	 *
-	 * @param <type> $type
-	 * @param <type> $template
+	 * @param String $group - the group of notices to render
+	 * @param String $template - the View to use to render the notices
 	 */
-	public static function render($type = NULL, $template = 'notice/render')
+	public static function render($group = NULL, $template = 'notice/render')
 	{
-		if ($type == NULL)
+		if ($group == NULL)
 		{
-			//echo all the types
-			if (sizeof(self::$notices) == 0)
+			//render all the groups
+			if (sizeof(self::$notices) > 0)
 			{
-				if (sizeof(self::$views) != 0)
+				foreach (self::$notices as $g => $notices)
 				{
-					foreach (self::$views as $view)
+					//save it incase it needs to be rendered again
+					self::$history[$g] = View::factory($template)
+						->set('group', $g)
+						->set('notices', $notices);
+					echo self::$history[$g];
+				}
+				//clear $notices for new ones
+				self::$notices = array();
+			}
+			else
+			{
+				//display any notices that are in history
+				if (sizeof(self::$history) != 0)
+				{
+					foreach (self::$history as $view)
 					{
 						//display all the views (this is a repeat render)
 						echo $view;
 					}
 				}
 			}
-			else
-			{
-				foreach (self::$notices as $type => $notices)
-				{
-					//reset the saved views
-					self::$views = array();
-					//save it incase it needs to be rendered again
-					self::$views[$type] = View::factory($template)
-						->set('type', $type)
-						->set('notices', $notices);
-					echo self::$views[$type];
-				}
-				//clear $notices for new ones
-				self::$notices = array();
-			}
 		}
 		else
 		{
-			//only echo specified type (if not from $notices then from $views
-			if (isset(self::$notices[$type]))
+			//only echo specified type (if not from $notices then from $history
+			if (isset(self::$notices[$group]))
 			{
-				self::$views[$type] = View::factory($template)
-						->set('type', $type)
-						->set('notices', self::$notices[$type]);
-				echo self::$views[$type];
+				self::$history[$group] = View::factory($template)
+						->set('group', $group)
+						->set('notices', self::$notices[$group]);
+				//remove the notice from session
+				unset(self::$notices[$group]);
+				echo self::$history[$group];
 			}
 			else
 			{
-				echo (isset(self::$views[$type]))? self::$views[$type] : NULL;
+				if (isset(self::$history[$group]))
+				{
+					echo self::$history[$group];
+				}
 			}
 		}
-	}
-
-	/**
-	 * Saves all unrendered notices to the session
-	 */
-	public static function save()
-	{
+		//save new undisplayed noticed to session
 		Session::instance()->set('notices', self::$notices);
 	}
 
@@ -105,6 +117,6 @@ class Yuriko_Notice{
 	 */
 	public static function load()
 	{
-		self::$notices = Session::instance()->get_once('notices', array());
+		self::$notices = Session::instance()->get('notices', array());
 	}
 }

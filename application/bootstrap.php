@@ -50,26 +50,19 @@ Kohana::$config->attach(new Kohana_Config_File);
  */
 Kohana::modules(array(
 	 'core'       => MODPATH.'yuriko_core',
-	 'database'   => MODPATH.'database',   // Database access
-	 'orm'        => MODPATH.'orm',        // Object Relationship Mapping (not complete)
-	// 'image'      => MODPATH.'image',      // Image manipulation
-	// 'kodoc'      => MODPATH.'kodoc',      // Kohana documentation
-	 
-	// 'pagination' => MODPATH.'pagination', // Paging of results
-	// 'paypal'     => MODPATH.'paypal',     // PayPal integration (not complete)
-	// 'todoist'    => MODPATH.'todoist',    // Todoist integration
-	// 'unittest'   => MODPATH.'unittest',   // Unit testing
-	// 'codebench'  => MODPATH.'codebench',  // Benchmarking tool
+	 'admin'      => MODPATH.'yuriko_admin',
+	 'database'   => MODPATH.'database',
+	 'orm'        => MODPATH.'orm',
 	));
 
 /**
- * Set the routes. Each route must have a minimum of a name, a URI and a set of
- * defaults for the URI.
+ * Setup the YurikoCMS page route
  */
-Route::set('default', '(<controller>(/<action>(/<id>)))')
+Route::set('page', '(<permalink>)', array('permalink' => '.*'))
 	->defaults(array(
-		'controller' => 'main',
+		'controller' => 'page',
 		'action'     => 'index',
+		'directory'  => 'yuriko',
 	));
 
 /**

@@ -7,13 +7,6 @@
  * @license    http://yurikocms.com/license
  */
 
-/**
- * Setup Routes
- */
-Route::set('admin', 'admin(/<permalink>(/<id>))')
-	->defaults(array(
-		'controller' => 'page',
-		'action'     => 'load',
-		'permalink'  => 'main',
-		'directory'  => 'admin',
-	));
+//load notices from session
+notice::load();
+

@@ -1,29 +1,32 @@
 <?php
-
+/**
+ * Default Admin Template
+ */
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<?php echo assets::all(); ?>
-
-<title><?php echo (isset($title))?$title:'YurikoCMS'; ?></title>
+<?php assets::render(); ?>
+<title><?php echo $title; ?></title>
 </head>
 
 <body>
-    <div class="container_16 frontend" id="main_frame">
-		<div class="grid_16">
-			<?php echo html::image('themes/yuriko_cms/media/images/yuriko_logo.png'); ?>
-			<?php echo notice::render(); ?>
-		</div>
+    <div class="container_16" id="main_frame">
 		<!-- BEGIN SECTION -->
 		<div class="grid_16 section header">
-			 <?php foreach(section::get('Header') as $node): ?>
+			<?php echo html::image('media/images/yuriko_logo.png', array('alt' => 'YurikoCMS')); ?>
+		</div>
+		<!-- END SECTION -->
+		<!-- BEGIN SECTION -->
+		<div class="grid_16 section sub-header">
+			 <?php foreach(section::get('Sub-Header') as $node): ?>
 				<?php echo $node; ?>
 			<?php endforeach; ?>
 		</div>
 		<!-- END SECTION -->
 		<!-- BEGIN SECTION -->
 		<div class="grid_12 section content">
+			<?php notice::render(); ?>
 			<?php foreach(section::get('Main Content') as $node): ?>
 				<?php echo $node; ?>
 			<?php endforeach; ?>
@@ -31,6 +34,7 @@
 		<!-- END SECTION -->
 		<!-- BEGIN SECTION -->
 		<div class="grid_4 section side_panel">
+			<?php notice::render(); ?>
 			<?php foreach(section::get('Side Panel') as $node): ?>
 				<?php echo $node; ?>
 			<?php endforeach; ?>

@@ -19,18 +19,37 @@ class Controller_Yuriko_Page extends Controller_Template {
 	 */
 	public function action_index($permalink = NULL)
 	{
-		// the route would be found in the node_routes table
-		$route = route::get('yuriko_admin');
-		// the params would be found in the node_route_params
-		$uri1 = $route->uri(array('params' => 'Cool Nav!'));
-		$uri2 = $route->uri(array('params' => 'Cool Content!'));
-		$uri3 = $route->uri(array('params' => 'Cool Side Nav!'));
-		$uri4 = $route->uri(array('params' => 'Cool Copyright!'));
-		// 'Main Content' would be the section found in the DB
-		section::set('Sub-Header', Request::factory($uri1)->execute());
-		section::set('Main Content', Request::factory($uri2)->execute());
-		section::set('Side Panel', Request::factory($uri3)->execute());
-		section::set('Gutter', Request::factory($uri4)->execute());
+		$page = ORM::factory('page')->where('name','=',$permalink)->find();
+		//get all nodes on this page
+		$page_nodes = $page->page_nodes->find_all();
+		foreach ($page_nodes as $page_node)
+		{
+			$route_params = array();
+			//get this node
+			$node = $page_node->node;
+			//get custom parameters for this node
+			$params = $node->node_route_parameters->find_all();
+			foreach ($params as $param)
+			{
+				$route_params[$param->key] = $param->value;
+			}
+			//replace node params with page_node params
+			$params = $page_node->node_route_parameters->find_all();
+			foreach ($params as $param)
+			{
+				$route_params[$param->key] = $param->value;
+			}
+			//get the route
+			$node_route = $node->node_route;
+			//route name (to make the sub-request)
+			$route = route::get($node_route->name);
+			//find the uri (@TODO: parameters)
+			$uri = $route->uri($route_params);
+			//execute sub-request and put output in the right section
+			section::set($page_node->section, Request::factory($uri)
+				->execute());
+		}
+
 	}
 
 } // End Yuriko Page Controller

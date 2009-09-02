@@ -3,15 +3,16 @@
 /**
 * @package    YurikoCMS
 * @author     Lorenzo Pisani - Zeelot
+* @copyright  (c) 2008-2009 Lorenzo Pisani
 * @license    http://yurikocms.com/license
 */
 
-class Model_Page extends ORM {
+class Model_Node_Route_Parameter extends ORM {
 
-	protected $has_many = array
+	protected $belongs_to = array
 	(
-		'page_nodes' => array(),
-		'page_settings' => array(),
-		//@TODO: 'content_page_inheritances',
+		'node' => array(),
+		'page_node' => array(),
 	);
+
 }

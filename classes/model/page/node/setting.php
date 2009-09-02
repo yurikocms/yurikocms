@@ -6,12 +6,11 @@
 * @license    http://yurikocms.com/license
 */
 
-class Model_Page extends ORM {
+class Model_Page_Node_Setting extends ORM {
 
-	protected $has_many = array
+	protected $belongs_to = array
 	(
-		'page_nodes' => array(),
-		'page_settings' => array(),
-		//@TODO: 'content_page_inheritances',
+		'page_node' => array(),
 	);
+
 }

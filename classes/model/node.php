@@ -10,16 +10,12 @@ class Model_Node extends ORM {
 
 	protected $has_many = array
 	(
-		'node_settings',
-		'page_nodes',
+		'node_settings' => array(),
+		'page_nodes' => array(),
+		'node_route_parameters' => array(),
 	);
-
-	public function unique_key($id)
-	{
-		if ( ! empty($id) AND is_string($id) AND ! ctype_digit($id))
-		{
-			return 'permalink';
-		}
-		return parent::unique_key($id);
-	}
+	protected $belongs_to = array
+	(
+		'node_route' => array(),
+	);
 }

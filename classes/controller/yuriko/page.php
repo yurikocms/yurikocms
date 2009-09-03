@@ -9,6 +9,9 @@
  
 class Controller_Yuriko_Page extends Controller_Template {
 
+	//can't auto render because template is in DB
+	public $auto_render = FALSE;
+	
 	/**
 	 * 'Builds' the page based on $permalink.
 	 * Finds all the different nodes this page is made of
@@ -19,37 +22,47 @@ class Controller_Yuriko_Page extends Controller_Template {
 	 */
 	public function action_index($permalink = NULL)
 	{
-		$page = ORM::factory('page')->where('name','=',$permalink)->find();
-		//get all nodes on this page
-		$page_nodes = $page->page_nodes->find_all();
-		foreach ($page_nodes as $page_node)
-		{
-			$route_params = array();
-			//get this node
-			$node = $page_node->node;
-			//get custom parameters for this node
-			$params = $node->node_route_parameters->find_all();
-			foreach ($params as $param)
-			{
-				$route_params[$param->key] = $param->value;
-			}
-			//replace node params with page_node params
-			$params = $page_node->node_route_parameters->find_all();
-			foreach ($params as $param)
-			{
-				$route_params[$param->key] = $param->value;
-			}
-			//get the route
-			$node_route = $node->node_route;
-			//route name (to make the sub-request)
-			$route = route::get($node_route->name);
-			//find the uri (@TODO: parameters)
-			$uri = $route->uri($route_params);
-			//execute sub-request and put output in the right section
-			section::set($page_node->section, Request::factory($uri)
-				->execute());
-		}
+		$page = ORM::factory('page')->where('permalink','=',$permalink)->find();
 
+		if ($page->loaded())
+		{
+			$this->template = new View('templates/'.$page->template);
+
+			//get all nodes on this page
+			$page_nodes = $page->page_nodes->find_all();
+			foreach ($page_nodes as $page_node)
+			{
+				$route_params = array();
+				//get this node
+				$node = $page_node->node;
+				//get custom parameters for this node
+				$params = $node->node_route_parameters->find_all();
+				foreach ($params as $param)
+				{
+					$route_params[$param->key] = $param->value;
+				}
+				//replace node params with page_node params
+				$params = $page_node->node_route_parameters->find_all();
+				foreach ($params as $param)
+				{
+					$route_params[$param->key] = $param->value;
+				}
+				//get the route
+				$node_route = $node->node_route;
+				//route name (to make the sub-request)
+				$route = route::get($node_route->name);
+				//find the uri (@TODO: parameters)
+				$uri = $route->uri($route_params);
+				//execute sub-request and put output in the right section
+				section::set($page_node->section, Request::factory($uri)
+					->execute());
+			}
+		}
+		else
+		{
+			$this->template = new View('templates/default');
+		}
+		$this->request->response = $this->template;
 	}
 
 } // End Yuriko Page Controller

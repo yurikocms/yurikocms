@@ -8,7 +8,7 @@
 
 class Model_Page extends ORM {
 
-	protected $has_many = array
+	protected $_has_many = array
 	(
 		'page_nodes' => array(),
 		'page_settings' => array(),

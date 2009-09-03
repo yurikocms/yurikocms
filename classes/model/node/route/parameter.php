@@ -9,7 +9,7 @@
 
 class Model_Node_Route_Parameter extends ORM {
 
-	protected $belongs_to = array
+	protected $_belongs_to = array
 	(
 		'node' => array(),
 		'page_node' => array(),

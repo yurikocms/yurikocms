@@ -9,7 +9,7 @@
 
 class Model_Node_Setting extends ORM {
 
-	protected $belongs_to = array
+	protected $_belongs_to = array
 	(
 		'node' => array(),
 	);

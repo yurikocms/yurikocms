@@ -8,12 +8,12 @@
 
 class Model_Page_Node extends ORM {
 
-	protected $belongs_to = array
+	protected $_belongs_to = array
 	(
 		'page' => array(),
 		'node' => array(),
 	);
-	protected $has_many = array
+	protected $_has_many = array
 	(
 		'node_route_parameters' => array(),
 	);

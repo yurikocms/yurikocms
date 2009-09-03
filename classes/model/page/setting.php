@@ -8,6 +8,6 @@
 
 class Model_Page_Setting extends ORM {
 
-	protected $belongs_to = array('page');
+	protected $_belongs_to = array('page');
 
 }

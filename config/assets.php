@@ -23,7 +23,7 @@ return array
 (
 	'default_styles' => array
 	(
-		'file' => array('media/css/styles', 'css'),
+		'file' => array('media/css/styles.css', 'css'),
 		'weight' => 50,
 		// rules for when this asset should be included
 		'rules' => array
@@ -38,9 +38,9 @@ return array
 	(
 		'files' => array
 		(
-			array('media/css/reset', 'css'),
-			array('media/css/typography', 'css'),
-			array('media/css/960', 'css'),
+			array('media/css/reset.css', 'css'),
+			array('media/css/typography.css', 'css'),
+			array('media/css/960.css', 'css'),
 		),
 		'weight' => 0,
 		'rules' => array
@@ -52,7 +52,7 @@ return array
 	),
 	'ie6_fix' => array
 	(
-		'file' => array('media/css/ie6-styles', 'css'),
+		'file' => array('media/css/ie6-styles.css', 'css'),
 		'weight' => 55, // included after styles.css
 		'wrapper' => array('<!--[if IE 6]>', '<![endif]-->'),
 		'rules' => array

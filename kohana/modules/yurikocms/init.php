@@ -7,6 +7,13 @@
  * @license    http://yurikocms.com/license
  */
 
-//load notices from session
-notice::load();
-
+Route::set('yuriko.page', function($uri)
+{
+	//@TODO: Check for the page
+	return array();
+}, '<uri>')
+	->defaults(array(
+		'directory'  => 'yuriko',
+		'controller' => 'page',
+		'action'     => 'view',
+	));

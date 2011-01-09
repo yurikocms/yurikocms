@@ -1,0 +1,12 @@
+[submodule "kohana/system"]
+	path = kohana/system
+	url = git://github.com/yurikocms/kohana-core.git
+[submodule "kohana/modules/database"]
+	path = kohana/modules/database
+	url = git://github.com/yurikocms/kohana-database.git
+[submodule "kohana/modules/orm"]
+	path = kohana/modules/orm
+	url = git://github.com/yurikocms/kohana-orm.git
+[submodule "kohana/modules/minion"]
+	path = kohana/modules/minion
+	url = git://github.com/yurikocms/kohana-minion.git
